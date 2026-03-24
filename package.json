@@ -1,0 +1,31 @@
+{
+  "name": "it-dashboard-backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "test:db": "tsx scripts/test-db.ts",
+    "seed:users": "tsx scripts/seed-internal-users.ts",
+    "seed:categories": "tsx scripts/seed-categories.ts",
+    "seed:ticket": "tsx scripts/insert-test-ticket.ts",
+    "sync:preview": "tsx scripts/smartsheet-sync-preview.ts",
+    "sync:run": "tsx scripts/smartsheet-sync.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "nodemailer": "^6.10.1",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.23",
+    "@types/node": "^22.15.29",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2"
+  }
+}
