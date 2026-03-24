@@ -1,11 +1,34 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
-CREATE TYPE approval_status AS ENUM ('pending_approval', 'approved', 'denied');
-CREATE TYPE ticket_status AS ENUM ('new', 'triage', 'in_progress', 'waiting_on_requester', 'resolved', 'closed');
-CREATE TYPE priority AS ENUM ('low', 'medium', 'high', 'urgent');
-CREATE TYPE queue AS ENUM ('it', 'operations');
+DO $$
+BEGIN
+  CREATE TYPE approval_status AS ENUM ('pending_approval', 'approved', 'denied');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END$$;
 
-CREATE TABLE users (
+DO $$
+BEGIN
+  CREATE TYPE ticket_status AS ENUM ('new', 'triage', 'in_progress', 'waiting_on_requester', 'resolved', 'closed');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END$$;
+
+DO $$
+BEGIN
+  CREATE TYPE priority AS ENUM ('low', 'medium', 'high', 'urgent');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END$$;
+
+DO $$
+BEGIN
+  CREATE TYPE queue AS ENUM ('it', 'operations');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END$$;
+
+CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   full_name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
@@ -14,7 +37,7 @@ CREATE TABLE users (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE ticket_categories (
+CREATE TABLE IF NOT EXISTS ticket_categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   queue queue NOT NULL,
@@ -25,7 +48,7 @@ CREATE TABLE ticket_categories (
   UNIQUE (name, queue)
 );
 
-CREATE TABLE tickets (
+CREATE TABLE IF NOT EXISTS tickets (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   smartsheet_row_id TEXT NOT NULL,
   requester_name TEXT NOT NULL,
@@ -42,7 +65,7 @@ CREATE TABLE tickets (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE ticket_messages (
+CREATE TABLE IF NOT EXISTS ticket_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   ticket_id UUID NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
   message_type TEXT NOT NULL,
@@ -55,7 +78,7 @@ CREATE TABLE ticket_messages (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE ticket_audit_log (
+CREATE TABLE IF NOT EXISTS ticket_audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   ticket_id UUID NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
   actor_user_id UUID REFERENCES users(id),
@@ -67,7 +90,7 @@ CREATE TABLE ticket_audit_log (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE integration_sync_log (
+CREATE TABLE IF NOT EXISTS integration_sync_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   ticket_id UUID REFERENCES tickets(id),
   sync_type TEXT NOT NULL,
@@ -78,16 +101,16 @@ CREATE TABLE integration_sync_log (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_tickets_approval_status ON tickets (approval_status);
-CREATE UNIQUE INDEX idx_tickets_smartsheet_row_id ON tickets (smartsheet_row_id);
-CREATE INDEX idx_tickets_queue ON tickets (queue);
-CREATE INDEX idx_tickets_ticket_status ON tickets (ticket_status);
-CREATE INDEX idx_tickets_requester_email ON tickets (requester_email);
-CREATE INDEX idx_tickets_assignee_user_id ON tickets (assignee_user_id);
-CREATE INDEX idx_tickets_category_id ON tickets (category_id);
-CREATE INDEX idx_tickets_priority ON tickets (priority);
-CREATE INDEX idx_tickets_list_filter ON tickets (approval_status, queue, ticket_status, priority, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_tickets_approval_status ON tickets (approval_status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tickets_smartsheet_row_id ON tickets (smartsheet_row_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_queue ON tickets (queue);
+CREATE INDEX IF NOT EXISTS idx_tickets_ticket_status ON tickets (ticket_status);
+CREATE INDEX IF NOT EXISTS idx_tickets_requester_email ON tickets (requester_email);
+CREATE INDEX IF NOT EXISTS idx_tickets_assignee_user_id ON tickets (assignee_user_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_category_id ON tickets (category_id);
+CREATE INDEX IF NOT EXISTS idx_tickets_priority ON tickets (priority);
+CREATE INDEX IF NOT EXISTS idx_tickets_list_filter ON tickets (approval_status, queue, ticket_status, priority, created_at DESC);
 
-CREATE INDEX idx_ticket_messages_ticket_id_created_at ON ticket_messages (ticket_id, created_at DESC);
-CREATE INDEX idx_ticket_audit_log_ticket_id_created_at ON ticket_audit_log (ticket_id, created_at DESC);
-CREATE INDEX idx_integration_sync_log_ticket_id_created_at ON integration_sync_log (ticket_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ticket_messages_ticket_id_created_at ON ticket_messages (ticket_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ticket_audit_log_ticket_id_created_at ON ticket_audit_log (ticket_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_integration_sync_log_ticket_id_created_at ON integration_sync_log (ticket_id, created_at DESC);
