@@ -12,6 +12,7 @@ export interface SendEmailResult {
 }
 
 function shouldUseLogOnlyMode(): boolean {
+  // Default to non-delivery unless explicitly configured to avoid accidental external sends.
   const forceLogOnly = (process.env.EMAIL_LOG_ONLY || "true").toLowerCase() === "true";
   if (forceLogOnly) return true;
 
@@ -29,8 +30,10 @@ export async function sendEmail(input: SendEmailInput): Promise<SendEmailResult>
   const smtpUser = process.env.SMTP_USER || "";
   const smtpPass = process.env.SMTP_PASS || "";
 
+  // Missing config falls back to log-only so reply actions never fail just due to SMTP setup.
   const missingSmtpConfig = !from || !smtpHost || !smtpUser || !smtpPass;
 
+  // Log-only still returns success metadata so callers can persist message history consistently.
   if (shouldUseLogOnlyMode() || missingSmtpConfig) {
     console.log("[email] log-only mode");
     console.log({ to: input.to, subject: input.subject, text: input.text });

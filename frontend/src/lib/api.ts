@@ -66,6 +66,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3
 
 async function readErrorMessage(response: Response): Promise<string> {
   try {
+    // Backend sends { error: { message } }; fallback keeps client robust to non-JSON failures.
     const data = (await response.json()) as { error?: { message?: string } };
     if (data?.error?.message) return data.error.message;
   } catch {
@@ -84,6 +85,7 @@ export async function fetchTickets(query: TicketQuery): Promise<TicketsResponse>
   params.set("page", String(query.page ?? 1));
   params.set("limit", String(query.limit ?? 10));
 
+  // no-store avoids stale triage state in this internal dashboard workflow.
   const response = await fetch(`${API_BASE_URL}/tickets?${params.toString()}`, {
     method: "GET",
     cache: "no-store"
@@ -118,6 +120,7 @@ export async function updateTicket(
     category_id?: string | null;
   }
 ): Promise<Ticket> {
+  // This endpoint is intentionally shared by status, assignee, category, and approval updates.
   const response = await fetch(`${API_BASE_URL}/tickets/${id}`, {
     method: "PATCH",
     headers: {
@@ -221,6 +224,7 @@ export async function sendTicketReply(
   ticketId: string,
   body: string
 ): Promise<{ ok: boolean; message: TicketNote; email: { sent: boolean; mode: "smtp" | "log_only" } }> {
+  // Caller should inspect email.mode to message users correctly in log-only environments.
   const response = await fetch(`${API_BASE_URL}/tickets/${ticketId}/reply`, {
     method: "POST",
     headers: {

@@ -64,6 +64,7 @@ function printMappedPreview(mappedRows: MappedTicketInput[]): void {
 
 export async function syncSmartsheetRowsPreview(options: SyncPreviewOptions = {}): Promise<MappedTicketInput[]> {
   const rowLimit = options.rowLimit ?? DEFAULT_PREVIEW_ROW_LIMIT;
+  // Preview mode is for mapping/debugging only; it intentionally performs no DB writes.
   console.log("Smartsheet sync mode: READ-ONLY (no writeback)");
   const sheet = await fetchSheetRows();
   const previewRows = sheet.rows.slice(0, rowLimit);
@@ -93,7 +94,9 @@ export async function syncSmartsheetRowsToDb(): Promise<SyncRunResult> {
   let inserted = 0;
   let updated = 0;
 
+  // Sequential upserts trade throughput for simpler failure debugging in early MVP operations.
   for (const ticket of mappedRows) {
+    // Update first by stable external key so local ticket IDs remain unchanged across sync runs.
     const updateResult = await pool.query(
       `UPDATE tickets
        SET

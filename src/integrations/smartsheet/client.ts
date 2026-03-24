@@ -4,6 +4,7 @@ import { SmartsheetSheetResponse } from "./types";
 dotenv.config();
 
 const SMARTSHEET_BASE_URL = "https://api.smartsheet.com/2.0";
+// MVP guardrail: integration only reads Smartsheet data; no writeback supported here.
 const READ_ONLY_MODE = true;
 
 function requireEnv(name: string): string {
@@ -28,6 +29,7 @@ export async function fetchSheetRows(): Promise<SmartsheetSheetResponse> {
 
   const { apiToken, sheetId } = getSmartsheetConfig();
 
+  // Fetching full sheet keeps mapping logic simple for MVP; revisit if row volume grows.
   const response = await fetch(`${SMARTSHEET_BASE_URL}/sheets/${sheetId}`, {
     method: "GET",
     headers: {

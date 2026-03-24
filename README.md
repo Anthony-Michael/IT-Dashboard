@@ -1,143 +1,106 @@
 # IT Dashboard MVP
 
-Internal ticket dashboard for IT + Operations teams.  
-Phase 1 scope includes ticket list/detail, triage updates, internal notes, public replies, approval status updates, category management, and Smartsheet -> local DB sync.
+Internal ticket dashboard for IT + Operations teams. Smartsheet remains intake source-of-truth; this app provides triage workflows, activity history, and requester replies on top of a local Postgres copy.
 
-## What the app does
+## Purpose
 
-- Reads ticket intake data from Smartsheet (read-only against Smartsheet)
-- Stores tickets in local PostgreSQL
-- Provides internal dashboard UI for:
-  - ticket list + filters + pagination
-  - ticket detail and triage
-  - internal notes
-  - public requester replies (email + log-only fallback)
-  - approval status updates
-  - category management
+- Centralize ticket operations in one UI.
+- Keep Smartsheet intake and approval states.
+- Support triage, category management, internal notes, and requester replies.
 
-## Project structure
+## Architecture (At a Glance)
 
-- `src/` - backend API + integrations
-- `scripts/` - sync and seed scripts
-- `db/schema.sql` - MVP schema
-- `frontend/` - Next.js App Router frontend
+- **Frontend:** Next.js app in `frontend/`
+- **API:** Express server in `src/server.ts`
+- **DB:** PostgreSQL schema in `db/schema.sql`
+- **Sync:** Smartsheet pull/upsert in `src/integrations/smartsheet/`
+- **Email:** SMTP or log-only sender in `src/email/sender.ts`
 
-## Local setup
+For deeper system flow, use `ARCHITECTURE_OVERVIEW.md`.
+For change runbooks and risk guidance, use `MAINTENANCE_GUIDE.md`.
 
-1. Copy env files:
-   - backend: copy `.env.example` -> `.env`
-   - frontend: copy `frontend/.env.example` -> `frontend/.env.local`
-2. Install dependencies:
-   - backend: `npm install`
-   - frontend: `cd frontend && npm install`
-3. Start PostgreSQL (Docker commands below)
-4. Apply schema in your DB (`db/schema.sql`)
-5. Seed baseline data (users/categories)
+## Core Workflows
 
-## Backend run steps
+- **Smartsheet sync**
+  - Run `npm run sync:preview` to inspect mappings (no DB writes).
+  - Run `npm run sync:run` to upsert tickets by `smartsheet_row_id`.
+  - Sync updates intake fields only (`subject`, `description`, requester fields, `approval_status`, `queue`).
+- **Ticket lifecycle**
+  - Approval: `pending_approval` -> `approved` or `denied`
+  - Working status: `new`, `triage`, `in_progress`, `waiting_on_requester`, `resolved`, `closed`
+- **Messages**
+  - Internal note: `POST /tickets/:id/notes` (DB only)
+  - Public reply: `POST /tickets/:id/reply` (DB + email sender)
+  - Both appear in the ticket activity timeline.
 
-From repo root:
+## Local Development
 
-```bash
-npm install
-npm run dev
-```
+### 1) Configure env files
 
-Backend default URL: `http://localhost:3001`
+- Copy `.env.example` -> `.env`
+- Copy `frontend/.env.example` -> `frontend/.env.local`
 
-## Frontend run steps
-
-From `frontend`:
+### 2) Start Postgres
 
 ```bash
-npm install
-npm run dev
-```
-
-Frontend default URL: `http://localhost:3000`
-
-## Docker PostgreSQL steps
-
-Start local Postgres:
-
-```bash
-docker run --name it-dashboard-postgres ^
-  -e POSTGRES_PASSWORD=postgres ^
-  -e POSTGRES_USER=postgres ^
-  -e POSTGRES_DB=postgres ^
-  -p 5432:5432 ^
+docker run --name it-dashboard-postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_DB=postgres \
+  -p 5432:5432 \
   -d postgres:16
 ```
 
-Stop/start:
+### 3) Install deps
 
 ```bash
-docker stop it-dashboard-postgres
-docker start it-dashboard-postgres
+npm install
+cd frontend && npm install
 ```
 
-## Smartsheet env setup
-
-Required backend vars:
-
-- `SMARTSHEET_API_TOKEN`
-- `SMARTSHEET_SHEET_ID`
-
-Safety rule:
-
-- Sync is read-only against Smartsheet (no writeback calls in current implementation).
-
-## Email env setup
-
-Optional email vars:
-
-- `EMAIL_FROM`
-- `SMTP_HOST`
-- `SMTP_PORT`
-- `SMTP_USER`
-- `SMTP_PASS`
-- `EMAIL_LOG_ONLY` (default: `true`)
-- `EMAIL_ALLOW_SEND_IN_DEV` (default: `false`)
-
-`EMAIL_LOG_ONLY=true` behavior:
-
-- Public replies are saved to DB
-- Email payload is logged to server output
-- No outbound SMTP send occurs
-
-## Seed commands
-
-From repo root:
+### 4) Initialize DB + seed baseline data
 
 ```bash
-npm run seed:users
-npm run seed:categories
-npm run seed:ticket
+npm run setup:db
 ```
 
-## Sync commands
+### 5) Run services
 
-From repo root:
+Backend (repo root):
 
 ```bash
-npm run sync:preview
-npm run sync:run
+npm run dev
 ```
 
-- `sync:preview` - prints column/row mapping preview (no DB writes)
-- `sync:run` - reads Smartsheet rows and upserts local `tickets`
+Frontend (`frontend/`):
 
-## Database migration notes
+```bash
+npm run dev
+```
 
-If your DB predates latest schema changes, apply notes in:
+Defaults:
+- API: `http://localhost:3001`
+- UI: `http://localhost:3000`
 
-- `DB_MIGRATION_NOTES.md`
+## Deployment Overview
 
-## Known MVP limitations
+- Recommended: frontend on Vercel, API + Postgres on Render.
+- Keep separate staging and production env configs.
+- Staging must use test Smartsheet credentials; production must use live credentials.
 
-- No authentication/RBAC
-- No inbound email handling/threading
-- No attachments/rich text
-- No SLA automation/escalation
-- No employee-facing portal
-- Smartsheet remains intake source-of-truth in Phase 1
+## Important Environment Variables
+
+- **Backend core:** `PORT`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `CORS_ALLOWED_ORIGINS`
+- **Smartsheet:** `SMARTSHEET_API_TOKEN`, `SMARTSHEET_SHEET_ID`
+- **Message author fallback:** `INTERNAL_NOTE_AUTHOR_USER_ID`
+- **Email:** `EMAIL_LOG_ONLY`, `EMAIL_ALLOW_SEND_IN_DEV`, `EMAIL_FROM`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
+- **Frontend:** `NEXT_PUBLIC_API_BASE_URL`
+
+## Known MVP Limitations
+
+- No auth/RBAC in API or UI.
+- No inbound email ingestion/threading.
+- No attachments or rich text.
+- No SLA/escalation automation.
+- `ticket_audit_log` and `integration_sync_log` tables are not written by current code.
+- Sync is manual/script-driven (no scheduler in repo).

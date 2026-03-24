@@ -23,6 +23,7 @@ const ALLOWED_TICKET_STATUS = new Set([
   "closed"
 ]);
 const DEFAULT_INTERNAL_NOTE_AUTHOR_USER_ID = "11111111-1111-4111-8111-111111111111";
+// Keep CORS explicit per environment so internal APIs are not broadly exposed.
 const ALLOWED_CORS_ORIGINS = (process.env.CORS_ALLOWED_ORIGINS || "http://localhost:3000")
   .split(",")
   .map((origin) => origin.trim())
@@ -106,6 +107,7 @@ app.get("/tickets", async (req, res) => {
     const limit = Math.min(requestedLimit, MAX_LIMIT);
     const offset = (page - 1) * limit;
 
+    // Dynamic query keeps one endpoint for all list filters; be careful to preserve param order.
     const whereClauses: string[] = [];
     const params: Array<string | number> = [];
 
@@ -252,6 +254,7 @@ app.patch("/tickets/:id", async (req, res) => {
     assigneeUserIdInput === undefined || assigneeUserIdInput === "" ? undefined : assigneeUserIdInput;
   const categoryId = categoryIdInput === undefined || categoryIdInput === "" ? undefined : categoryIdInput;
 
+  // Undefined means "leave unchanged"; null means "explicitly clear field" for FK columns.
   const updates: string[] = [];
   const params: Array<string | null> = [];
 
@@ -500,6 +503,7 @@ app.post("/tickets/:id/notes", async (req, res) => {
   }
 
   try {
+    // MVP uses a configured default author until auth/user context is wired into requests.
     const authorUserId = process.env.INTERNAL_NOTE_AUTHOR_USER_ID || DEFAULT_INTERNAL_NOTE_AUTHOR_USER_ID;
 
     const authorExists = await pool.query("SELECT 1 FROM users WHERE id = $1", [authorUserId]);

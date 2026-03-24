@@ -96,6 +96,7 @@ export default function TicketsPage() {
   }, [total]);
 
   function updateFilter<K extends keyof Filters>(key: K, value: Filters[K]) {
+    // Reset page when filters change to avoid requesting empty pages from prior pagination state.
     setPage(1);
     setFilters((prev) => ({ ...prev, [key]: value }));
   }

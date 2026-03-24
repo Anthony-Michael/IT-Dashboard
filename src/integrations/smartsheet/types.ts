@@ -25,6 +25,7 @@ export interface SmartsheetSheetResponse {
 }
 
 export interface MappedTicketInput {
+  // This mirrors the minimum fields required for local ticket upsert in sync.ts.
   smartsheet_row_id: string;
   subject: string;
   description: string;

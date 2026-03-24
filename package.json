@@ -10,6 +10,7 @@
     "seed:users": "tsx scripts/seed-internal-users.ts",
     "seed:categories": "tsx scripts/seed-categories.ts",
     "seed:ticket": "tsx scripts/insert-test-ticket.ts",
+    "setup:db": "tsx scripts/setup-db.ts",
     "sync:preview": "tsx scripts/smartsheet-sync-preview.ts",
     "sync:run": "tsx scripts/smartsheet-sync.ts"
   },

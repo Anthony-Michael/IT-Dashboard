@@ -29,6 +29,7 @@ const TICKET_STATUS_OPTIONS: TicketStatus[] = [
 ];
 
 const ASSIGNEE_OPTIONS = [
+  // MVP shortcut: static assignee list seeded in scripts/seed-internal-users.ts.
   { label: "Unassigned", value: "" },
   { label: "Tyler (IT)", value: "11111111-1111-4111-8111-111111111111" },
   { label: "Dee (Operations)", value: "22222222-2222-4222-8222-222222222222" },
@@ -140,6 +141,7 @@ export default function TicketDetailPage() {
 
     try {
       const result = await sendTicketReply(ticketId, trimmedBody);
+      // Re-read notes instead of optimistic append to keep ordering/source-of-truth from API.
       const refreshedNotes = await fetchTicketNotes(ticketId);
       setNotes(refreshedNotes);
       setReplyBody("");
