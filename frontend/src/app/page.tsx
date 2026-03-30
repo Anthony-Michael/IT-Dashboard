@@ -33,6 +33,10 @@ function formatDate(value: string): string {
   return new Date(value).toLocaleString();
 }
 
+function getDisplaySubmittedAt(ticket: Ticket): string {
+  return ticket.submitted_at || ticket.created_at;
+}
+
 export default function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
@@ -210,7 +214,7 @@ export default function TicketsPage() {
                   <th className="px-3 py-2">Approval</th>
                   <th className="px-3 py-2">Status</th>
                   <th className="px-3 py-2">Priority</th>
-                  <th className="px-3 py-2">Created At</th>
+                  <th className="px-3 py-2">Submitted At</th>
                 </tr>
               </thead>
               <tbody>
@@ -235,7 +239,7 @@ export default function TicketsPage() {
                       <StatusBadge value={ticket.ticket_status} />
                     </td>
                     <td className="px-3 py-2 text-slate-700">{ticket.priority}</td>
-                    <td className="px-3 py-2 text-slate-700">{formatDate(ticket.created_at)}</td>
+                    <td className="px-3 py-2 text-slate-700">{formatDate(getDisplaySubmittedAt(ticket))}</td>
                   </tr>
                 ))}
               </tbody>

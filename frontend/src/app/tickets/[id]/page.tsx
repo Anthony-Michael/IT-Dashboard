@@ -242,7 +242,13 @@ export default function TicketDetailPage() {
               <p className="text-sm text-slate-800">{ticket.priority}</p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Created At</p>
+              <p className="text-xs uppercase tracking-wide text-slate-500">Submitted At</p>
+              <p className="text-sm text-slate-800">
+                {ticket.submitted_at ? formatDate(ticket.submitted_at) : formatDate(ticket.created_at)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-wide text-slate-500">Record Created At</p>
               <p className="text-sm text-slate-800">{formatDate(ticket.created_at)}</p>
             </div>
           </section>

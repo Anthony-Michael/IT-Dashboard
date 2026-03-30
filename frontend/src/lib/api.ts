@@ -15,6 +15,7 @@ export interface Ticket {
   requester_email: string;
   subject: string;
   description: string;
+  submitted_at?: string | null;
   queue: Queue;
   approval_status: ApprovalStatus;
   ticket_status: TicketStatus;

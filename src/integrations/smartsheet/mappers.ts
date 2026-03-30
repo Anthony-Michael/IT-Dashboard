@@ -28,6 +28,19 @@ function mapQueue(rawValue: string): MappedTicketInput["queue"] {
   return normalized.includes("operation") ? "operations" : "it";
 }
 
+function parseSmartsheetDate(rawValue: string): string | null {
+  if (!rawValue) {
+    return null;
+  }
+
+  const parsed = new Date(rawValue);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed.toISOString();
+}
+
 export function mapSmartsheetRowToTicket(row: SmartsheetRow, columns: SmartsheetColumn[]): MappedTicketInput {
   const columnsByTitle = new Map<string, SmartsheetColumn>();
   for (const column of columns) {
@@ -41,6 +54,8 @@ export function mapSmartsheetRowToTicket(row: SmartsheetRow, columns: Smartsheet
     getCellText(row, columnsByTitle, "Email of Person Generating the Request") || "";
   const subject = getCellText(row, columnsByTitle, "Maintenance Type") || "Maintenance Request";
   const description = getCellText(row, columnsByTitle, "Detailed Notes of the Maintenance Issue") || "";
+  const submittedAtRaw = getCellText(row, columnsByTitle, "Date Submitted");
+  const submittedAt = parseSmartsheetDate(submittedAtRaw);
 
   // Keep fallback conservative: unknown values stay pending_approval for manual review.
   const approvalRaw = getCellText(row, columnsByTitle, "Approval").toLowerCase();
@@ -63,6 +78,7 @@ export function mapSmartsheetRowToTicket(row: SmartsheetRow, columns: Smartsheet
     description,
     requester_name: requesterName,
     requester_email: requesterEmail,
+    submitted_at: submittedAt,
     approval_status: approvalStatus,
     queue
   };

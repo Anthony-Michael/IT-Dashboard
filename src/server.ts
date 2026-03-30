@@ -143,6 +143,7 @@ app.get("/tickets", async (req, res) => {
          t.requester_email,
          t.subject,
          t.description,
+         t.submitted_at,
          t.queue,
          t.approval_status,
          t.ticket_status,
@@ -151,6 +152,7 @@ app.get("/tickets", async (req, res) => {
          u.full_name AS assignee_name,
          t.category_id,
          c.name AS category_name,
+         t.submitted_at,
          t.created_at,
          t.updated_at
        FROM tickets t
@@ -197,6 +199,7 @@ app.get("/tickets/:id", async (req, res) => {
          t.requester_email,
          t.subject,
          t.description,
+         t.submitted_at,
          t.queue,
          t.approval_status,
          t.ticket_status,
@@ -205,6 +208,7 @@ app.get("/tickets/:id", async (req, res) => {
          u.full_name AS assignee_name,
          t.category_id,
          c.name AS category_name,
+         t.submitted_at,
          t.created_at,
          t.updated_at
        FROM tickets t
@@ -307,12 +311,14 @@ app.patch("/tickets/:id", async (req, res) => {
          t.requester_email,
          t.subject,
          t.description,
+         t.submitted_at,
          t.queue,
          t.approval_status,
          t.ticket_status,
          t.priority,
          t.assignee_user_id,
          t.category_id,
+         t.submitted_at,
          t.created_at,
          t.updated_at`,
       params
@@ -331,6 +337,7 @@ app.patch("/tickets/:id", async (req, res) => {
          t.requester_email,
          t.subject,
          t.description,
+         t.submitted_at,
          t.queue,
          t.approval_status,
          t.ticket_status,
@@ -339,6 +346,7 @@ app.patch("/tickets/:id", async (req, res) => {
          u.full_name AS assignee_name,
          t.category_id,
          c.name AS category_name,
+         t.submitted_at,
          t.created_at,
          t.updated_at
        FROM tickets t
@@ -507,7 +515,7 @@ app.post("/tickets/:id/notes", async (req, res) => {
     const authorUserId = process.env.INTERNAL_NOTE_AUTHOR_USER_ID || DEFAULT_INTERNAL_NOTE_AUTHOR_USER_ID;
 
     const authorExists = await pool.query("SELECT 1 FROM users WHERE id = $1", [authorUserId]);
-    const safeAuthorUserId = authorExists.rowCount > 0 ? authorUserId : null;
+    const safeAuthorUserId = (authorExists.rowCount ?? 0) > 0 ? authorUserId : null;
 
     const result = await pool.query(
       `INSERT INTO ticket_messages (
@@ -580,7 +588,7 @@ app.post("/tickets/:id/reply", async (req, res) => {
 
     const authorUserId = process.env.INTERNAL_NOTE_AUTHOR_USER_ID || DEFAULT_INTERNAL_NOTE_AUTHOR_USER_ID;
     const authorExists = await pool.query("SELECT 1 FROM users WHERE id = $1", [authorUserId]);
-    const safeAuthorUserId = authorExists.rowCount > 0 ? authorUserId : null;
+    const safeAuthorUserId = (authorExists.rowCount ?? 0) > 0 ? authorUserId : null;
 
     const insertResult = await pool.query(
       `INSERT INTO ticket_messages (

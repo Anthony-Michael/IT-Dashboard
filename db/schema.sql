@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS tickets (
   requester_email TEXT NOT NULL,
   subject TEXT NOT NULL,
   description TEXT,
+  submitted_at TIMESTAMPTZ,
   queue queue NOT NULL,
   approval_status approval_status NOT NULL DEFAULT 'pending_approval',
   ticket_status ticket_status NOT NULL DEFAULT 'new',

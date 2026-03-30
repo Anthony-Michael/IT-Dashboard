@@ -106,6 +106,12 @@ export async function syncSmartsheetRowsToDb(): Promise<SyncRunResult> {
          requester_email = $5,
          approval_status = $6::approval_status,
          queue = $7::queue,
+         submitted_at = CASE
+           WHEN $8::timestamptz IS NOT NULL
+             AND submitted_at IS DISTINCT FROM $8::timestamptz
+           THEN $8::timestamptz
+           ELSE submitted_at
+         END,
          updated_at = NOW()
        WHERE smartsheet_row_id = $1
        RETURNING id`,
@@ -116,7 +122,8 @@ export async function syncSmartsheetRowsToDb(): Promise<SyncRunResult> {
         ticket.requester_name,
         ticket.requester_email,
         ticket.approval_status,
-        ticket.queue
+        ticket.queue,
+        ticket.submitted_at
       ]
     );
 
@@ -132,15 +139,17 @@ export async function syncSmartsheetRowsToDb(): Promise<SyncRunResult> {
          requester_email,
          subject,
          description,
+         submitted_at,
          queue,
          approval_status
-       ) VALUES ($1, $2, $3, $4, $5, $6::queue, $7::approval_status)`,
+       ) VALUES ($1, $2, $3, $4, $5, $6::timestamptz, $7::queue, $8::approval_status)`,
       [
         ticket.smartsheet_row_id,
         ticket.requester_name,
         ticket.requester_email,
         ticket.subject,
         ticket.description,
+        ticket.submitted_at,
         ticket.queue,
         ticket.approval_status
       ]

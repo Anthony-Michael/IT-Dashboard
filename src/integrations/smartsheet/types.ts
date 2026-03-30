@@ -31,6 +31,7 @@ export interface MappedTicketInput {
   description: string;
   requester_name: string;
   requester_email: string;
+  submitted_at: string | null;
   approval_status: "pending_approval" | "approved" | "denied";
   queue: "it" | "operations";
 }

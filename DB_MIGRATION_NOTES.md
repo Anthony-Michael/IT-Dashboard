@@ -43,3 +43,10 @@ BEGIN
   END IF;
 END$$;
 ```
+
+## 4) Add original Smartsheet submission timestamp
+
+```sql
+ALTER TABLE tickets
+ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMPTZ;
+```
