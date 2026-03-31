@@ -3,8 +3,8 @@ import { pool } from "../src/db";
 const INTERNAL_USERS = [
   {
     id: "11111111-1111-4111-8111-111111111111",
-    full_name: "Tyler",
-    email: "tyler@example.com",
+    full_name: "Anthony",
+    email: "anthony@example.com",
     role: "it_coordinator"
   },
   {

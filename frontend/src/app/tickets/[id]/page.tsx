@@ -32,7 +32,7 @@ const TICKET_STATUS_OPTIONS: TicketStatus[] = [
 const ASSIGNEE_OPTIONS = [
   // MVP shortcut: static assignee list seeded in scripts/seed-internal-users.ts.
   { label: "Unassigned", value: "" },
-  { label: "Tyler (IT)", value: "11111111-1111-4111-8111-111111111111" },
+  { label: "Anthony (IT)", value: "11111111-1111-4111-8111-111111111111" },
   { label: "Dee (Operations)", value: "22222222-2222-4222-8222-222222222222" },
   { label: "James (Director)", value: "33333333-3333-4333-8333-333333333333" }
 ];
@@ -200,238 +200,222 @@ export default function TicketDetailPage() {
 
   return (
     <AppShell>
-      <main className="mx-auto max-w-4xl p-4 md:p-6">
-      <div className="mb-4">
-        <Link href="/" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
-          Back to tickets
-        </Link>
-      </div>
+      <main className="mx-auto max-w-7xl p-4 md:p-6">
+        <div className="mb-4">
+          <Link href="/" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
+            Back to tickets
+          </Link>
+        </div>
 
-      {loading ? (
-        <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">Loading ticket...</div>
-      ) : !ticket ? (
-        <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">Ticket not found.</div>
-      ) : (
-        <div className="space-y-4">
-          <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
-            <h1 className="mb-2 text-xl font-semibold text-slate-900">{ticket.subject}</h1>
-            <p className="whitespace-pre-wrap text-sm text-slate-700">{ticket.description || "No description provided."}</p>
-          </section>
+        {loading ? (
+          <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">Loading ticket...</div>
+        ) : !ticket ? (
+          <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">Ticket not found.</div>
+        ) : (
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+            <div className="flex-1 space-y-4">
+              <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
+                <h1 className="mb-3 text-2xl font-semibold text-slate-900">{ticket.subject}</h1>
+                <div className="mb-4 grid grid-cols-1 gap-3 text-sm text-slate-700 md:grid-cols-3">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Requester</p>
+                    <p>{ticket.requester_name || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Email</p>
+                    <p>{ticket.requester_email || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Submitted At</p>
+                    <p>{ticket.submitted_at ? formatDate(ticket.submitted_at) : formatDate(ticket.created_at)}</p>
+                  </div>
+                </div>
+                <p className="whitespace-pre-wrap text-sm text-slate-700">
+                  {ticket.description || "No description provided."}
+                </p>
+              </section>
 
-          <section className="grid grid-cols-1 gap-4 rounded-lg border border-slate-200 bg-white p-4 md:grid-cols-2 md:p-5">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Requester Name</p>
-              <p className="text-sm text-slate-800">{ticket.requester_name || "-"}</p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Requester Email</p>
-              <p className="text-sm text-slate-800">{ticket.requester_email || "-"}</p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Queue</p>
-              <div className="pt-1">
-                <StatusBadge value={ticket.queue} />
-              </div>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Approval Status</p>
-              <div className="pt-1">
-                <StatusBadge value={ticket.approval_status} />
-              </div>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Priority</p>
-              <p className="text-sm text-slate-800">{ticket.priority}</p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Submitted At</p>
-              <p className="text-sm text-slate-800">
-                {ticket.submitted_at ? formatDate(ticket.submitted_at) : formatDate(ticket.created_at)}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-wide text-slate-500">Record Created At</p>
-              <p className="text-sm text-slate-800">{formatDate(ticket.created_at)}</p>
-            </div>
-          </section>
+              {error ? (
+                <div className="rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{error}</div>
+              ) : null}
+              {saveMessage ? (
+                <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
+                  {saveMessage}
+                </div>
+              ) : null}
 
-          <section className="grid grid-cols-1 gap-4 rounded-lg border border-slate-200 bg-white p-4 md:grid-cols-2 md:p-5">
-            <label className="text-sm">
-              <span className="mb-1 block text-slate-700">Ticket Status</span>
-              <select
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                value={ticketStatus}
-                onChange={(e) => setTicketStatus(e.target.value as TicketStatus)}
-              >
-                {TICKET_STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
-                    {status.replaceAll("_", " ")}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
+                <h2 className="mb-3 text-base font-semibold text-slate-900">Ticket Activity</h2>
 
-            <label className="text-sm">
-              <span className="mb-1 block text-slate-700">Assignee</span>
-              <select
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                value={assigneeUserId}
-                onChange={(e) => setAssigneeUserId(e.target.value)}
-              >
-                {ASSIGNEE_OPTIONS.map((option) => (
-                  <option key={option.label} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="text-sm">
-              <span className="mb-1 block text-slate-700">Category</span>
-              <select
-                className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-              >
-                <option value="">None</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <div className="md:col-span-2">
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={saving}
-                className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {saving ? "Saving..." : "Save"}
-              </button>
-            </div>
-          </section>
-
-          <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
-            <h2 className="mb-3 text-base font-semibold text-slate-900">Approval</h2>
-            <div className="mb-3">
-              <p className="mb-1 text-xs uppercase tracking-wide text-slate-500">Current Approval Status</p>
-              <StatusBadge value={ticket.approval_status} />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => handleApprovalUpdate("approved")}
-                disabled={approvalSaving || ticket.approval_status === "approved"}
-                className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {approvalSaving && ticket.approval_status !== "approved" ? "Updating..." : "Approve"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleApprovalUpdate("denied")}
-                disabled={approvalSaving || ticket.approval_status === "denied"}
-                className="rounded-md bg-rose-700 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {approvalSaving && ticket.approval_status !== "denied" ? "Updating..." : "Deny"}
-              </button>
-            </div>
-          </section>
-
-          {error ? (
-            <div className="rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{error}</div>
-          ) : null}
-          {saveMessage ? (
-            <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">
-              {saveMessage}
-            </div>
-          ) : null}
-
-          <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
-            <h2 className="mb-3 text-base font-semibold text-slate-900">Ticket Activity</h2>
-
-            {notesLoading ? (
-              <p className="mb-4 text-sm text-slate-600">Loading activity...</p>
-            ) : notes.length === 0 ? (
-              <p className="mb-4 text-sm text-slate-600">No messages yet.</p>
-            ) : (
-              <div className="mb-4 space-y-3">
-                {notes.map((note) => (
-                  <div
-                    key={note.id}
-                    className={`rounded-md border p-3 ${
-                      note.message_type === "public_reply"
-                        ? "border-blue-200 bg-blue-50"
-                        : "border-slate-200 bg-slate-50"
-                    }`}
-                  >
-                    <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
-                      <span
-                        className={`rounded px-2 py-0.5 font-medium ${
+                {notesLoading ? (
+                  <p className="mb-4 text-sm text-slate-600">Loading activity...</p>
+                ) : notes.length === 0 ? (
+                  <p className="mb-4 text-sm text-slate-600">No messages yet.</p>
+                ) : (
+                  <div className="mb-4 space-y-3">
+                    {notes.map((note) => (
+                      <div
+                        key={note.id}
+                        className={`rounded-md border p-3 ${
                           note.message_type === "public_reply"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-slate-200 text-slate-700"
+                            ? "border-blue-200 bg-blue-50"
+                            : "border-slate-200 bg-slate-50"
                         }`}
                       >
-                        {note.message_type === "public_reply" ? "Sent to requester" : "Internal note"}
-                      </span>
-                      <span className="text-slate-600">{note.author_name || "Internal User"}</span>
-                      <span className="text-slate-400">|</span>
-                      <span className="text-slate-600">{formatDate(note.created_at)}</span>
-                    </div>
-                    {note.message_type === "public_reply" && note.to_email ? (
-                      <p className="mb-2 text-xs text-blue-700">To: {note.to_email}</p>
-                    ) : null}
-                    <p className="whitespace-pre-wrap text-sm text-slate-800">{note.body}</p>
+                        <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
+                          <span
+                            className={`rounded px-2 py-0.5 font-medium ${
+                              note.message_type === "public_reply"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-slate-200 text-slate-700"
+                            }`}
+                          >
+                            {note.message_type === "public_reply" ? "Sent to requester" : "Internal note"}
+                          </span>
+                          <span className="text-slate-600">{note.author_name || "Internal User"}</span>
+                          <span className="text-slate-400">|</span>
+                          <span className="text-slate-600">{formatDate(note.created_at)}</span>
+                        </div>
+                        {note.message_type === "public_reply" && note.to_email ? (
+                          <p className="mb-2 text-xs text-blue-700">To: {note.to_email}</p>
+                        ) : null}
+                        <p className="whitespace-pre-wrap text-sm text-slate-800">{note.body}</p>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
+                <div className="space-y-2">
+                  <textarea
+                    className="min-h-[100px] w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    placeholder="Add an internal note..."
+                    value={newNoteBody}
+                    onChange={(e) => setNewNoteBody(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddNote}
+                    disabled={noteSaving || newNoteBody.trim().length === 0}
+                    className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {noteSaving ? "Adding..." : "Add Note"}
+                  </button>
+                </div>
+              </section>
+
+              <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
+                <h2 className="mb-3 text-base font-semibold text-slate-900">Reply to Requester</h2>
+                <div className="space-y-2">
+                  <textarea
+                    className="min-h-[120px] w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    placeholder="Write a public reply to send to the requester..."
+                    value={replyBody}
+                    onChange={(e) => setReplyBody(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSendReply}
+                    disabled={replySaving || replyBody.trim().length === 0}
+                    className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {replySaving ? "Sending..." : "Send Reply"}
+                  </button>
+                  {replyMessage ? <p className="text-sm text-emerald-700">{replyMessage}</p> : null}
+                </div>
+              </section>
+            </div>
+
+            <aside className="w-full lg:w-[320px] lg:shrink-0">
+              <div className="space-y-4 lg:sticky lg:top-6">
+                <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
+                <h2 className="mb-3 text-base font-semibold text-slate-900">Ticket Details</h2>
+                <div className="space-y-4">
+                  <label className="text-sm">
+                    <span className="mb-1 block text-slate-700">Assignee</span>
+                    <select
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                      value={assigneeUserId}
+                      onChange={(e) => setAssigneeUserId(e.target.value)}
+                    >
+                      {ASSIGNEE_OPTIONS.map((option) => (
+                        <option key={option.label} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="text-sm">
+                    <span className="mb-1 block text-slate-700">Status</span>
+                    <select
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                      value={ticketStatus}
+                      onChange={(e) => setTicketStatus(e.target.value as TicketStatus)}
+                    >
+                      {TICKET_STATUS_OPTIONS.map((status) => (
+                        <option key={status} value={status}>
+                          {status.replaceAll("_", " ")}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="text-sm">
+                    <span className="mb-1 block text-slate-700">Category</span>
+                    <select
+                      className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                      value={categoryId}
+                      onChange={(e) => setCategoryId(e.target.value)}
+                    >
+                      <option value="">None</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {saving ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+                </section>
+
+                <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
+                <h2 className="mb-3 text-base font-semibold text-slate-900">Approval</h2>
+                <div className="mb-3">
+                  <p className="mb-1 text-xs uppercase tracking-wide text-slate-500">Current Approval Status</p>
+                  <StatusBadge value={ticket.approval_status} />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleApprovalUpdate("approved")}
+                    disabled={approvalSaving || ticket.approval_status === "approved"}
+                    className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {approvalSaving && ticket.approval_status !== "approved" ? "Updating..." : "Approve"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleApprovalUpdate("denied")}
+                    disabled={approvalSaving || ticket.approval_status === "denied"}
+                    className="rounded-md bg-rose-700 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {approvalSaving && ticket.approval_status !== "denied" ? "Updating..." : "Deny"}
+                  </button>
+                </div>
+                </section>
               </div>
-            )}
-
-            <div className="space-y-2">
-              <textarea
-                className="min-h-[100px] w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                placeholder="Add an internal note..."
-                value={newNoteBody}
-                onChange={(e) => setNewNoteBody(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={handleAddNote}
-                disabled={noteSaving || newNoteBody.trim().length === 0}
-                className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {noteSaving ? "Adding..." : "Add Note"}
-              </button>
-            </div>
-          </section>
-
-          <section className="rounded-lg border border-slate-200 bg-white p-4 md:p-5">
-            <h2 className="mb-3 text-base font-semibold text-slate-900">Reply to Requester</h2>
-            <div className="space-y-2">
-              <textarea
-                className="min-h-[120px] w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                placeholder="Write a public reply to send to the requester..."
-                value={replyBody}
-                onChange={(e) => setReplyBody(e.target.value)}
-              />
-              <button
-                type="button"
-                onClick={handleSendReply}
-                disabled={replySaving || replyBody.trim().length === 0}
-                className="rounded-md bg-blue-700 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {replySaving ? "Sending..." : "Send Reply"}
-              </button>
-              {replyMessage ? (
-                <p className="text-sm text-emerald-700">{replyMessage}</p>
-              ) : null}
-            </div>
-          </section>
-        </div>
-      )}
+            </aside>
+          </div>
+        )}
       </main>
     </AppShell>
   );
