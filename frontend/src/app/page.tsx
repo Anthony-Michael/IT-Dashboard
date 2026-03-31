@@ -16,6 +16,8 @@ import { AppShell } from "../components/layout/app-shell";
 import { SidebarItemId, ViewsSidebar } from "../components/layout/views-sidebar";
 
 const PAGE_SIZE = 10;
+const CURRENT_USER = "Anthony";
+const CURRENT_USER_ID = "11111111-1111-4111-8111-111111111111";
 
 type Filters = {
   approval_status: ApprovalStatus | "";
@@ -37,6 +39,14 @@ function formatDate(value: string): string {
 
 function getDisplaySubmittedAt(ticket: Ticket): string {
   return ticket.submitted_at || ticket.created_at;
+}
+
+function isAssignedToCurrentUser(ticket: Ticket): boolean {
+  const assigneeName = (ticket.assignee_name || "").trim().toLowerCase();
+  if (assigneeName && assigneeName === CURRENT_USER.toLowerCase()) {
+    return true;
+  }
+  return ticket.assignee_user_id === CURRENT_USER_ID;
 }
 
 export default function TicketsPage() {
@@ -144,18 +154,22 @@ export default function TicketsPage() {
 
   const displayedTickets = useMemo(() => {
     if (activeSidebarItem !== "unassigned") {
+      if (activeSidebarItem === "my_tickets") {
+        return tickets.filter(isAssignedToCurrentUser);
+      }
       return tickets;
     }
     return tickets.filter((ticket) => !ticket.assignee_user_id);
   }, [activeSidebarItem, tickets]);
 
-  const displayedTotal = activeSidebarItem === "unassigned" ? displayedTickets.length : total;
+  const isClientSideCountView = activeSidebarItem === "unassigned" || activeSidebarItem === "my_tickets";
+  const displayedTotal = isClientSideCountView ? displayedTickets.length : total;
 
   const totalPages = useMemo(() => {
-    if (activeSidebarItem === "unassigned") return 1;
+    if (isClientSideCountView) return 1;
     if (total <= 0) return 1;
     return Math.ceil(total / PAGE_SIZE);
-  }, [activeSidebarItem, total]);
+  }, [isClientSideCountView, total]);
 
   const canGoPrevious = page > 1;
   const canGoNext = page < totalPages;
@@ -253,6 +267,12 @@ export default function TicketsPage() {
               </div>
             ) : null}
 
+            {activeSidebarItem === "my_tickets" ? (
+              <div className="mb-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+                My Tickets view is filtered client-side for {CURRENT_USER}.
+              </div>
+            ) : null}
+
             {error ? (
               <div className="mb-4 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
                 <p className="mb-2">{error}</p>
@@ -269,7 +289,9 @@ export default function TicketsPage() {
             {loading ? (
               <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">Loading tickets...</div>
             ) : displayedTickets.length === 0 ? (
-              <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">No tickets found.</div>
+              <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
+                {activeSidebarItem === "my_tickets" ? `No tickets assigned to ${CURRENT_USER}` : "No tickets found."}
+              </div>
             ) : (
               <>
                 <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">

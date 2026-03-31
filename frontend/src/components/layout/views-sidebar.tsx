@@ -2,6 +2,7 @@
 
 type SidebarItemId =
   | "all_tickets"
+  | "my_tickets"
   | "pending_approval"
   | "unassigned"
   | "recently_updated"
@@ -28,6 +29,7 @@ const SECTIONS: SidebarSection[] = [
     title: "Views",
     items: [
       { id: "all_tickets", label: "All Tickets" },
+      { id: "my_tickets", label: "My Tickets" },
       { id: "pending_approval", label: "Pending Approval" },
       { id: "unassigned", label: "Unassigned" },
       { id: "recently_updated", label: "Recently Updated", disabled: true }
