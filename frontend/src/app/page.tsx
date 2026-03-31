@@ -12,6 +12,7 @@ import {
   TicketStatus
 } from "../lib/api";
 import { StatusBadge } from "../components/tickets/status-badge";
+import { AppShell } from "../components/layout/app-shell";
 
 const PAGE_SIZE = 10;
 
@@ -109,7 +110,8 @@ export default function TicketsPage() {
   const canGoNext = page < totalPages;
 
   return (
-    <main className="mx-auto max-w-7xl p-4 md:p-6">
+    <AppShell>
+      <main className="mx-auto max-w-7xl p-4 md:p-6">
       <header className="mb-4">
         <h1 className="text-xl font-semibold text-slate-900">Tickets</h1>
         <div className="flex items-center justify-between gap-3">
@@ -272,6 +274,7 @@ export default function TicketsPage() {
           </div>
         </>
       )}
-    </main>
+      </main>
+    </AppShell>
   );
 }

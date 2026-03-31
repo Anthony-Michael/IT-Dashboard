@@ -18,6 +18,7 @@ import {
   updateTicketApproval
 } from "../../../lib/api";
 import { StatusBadge } from "../../../components/tickets/status-badge";
+import { AppShell } from "../../../components/layout/app-shell";
 
 const TICKET_STATUS_OPTIONS: TicketStatus[] = [
   "new",
@@ -198,7 +199,8 @@ export default function TicketDetailPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-4 md:p-6">
+    <AppShell>
+      <main className="mx-auto max-w-4xl p-4 md:p-6">
       <div className="mb-4">
         <Link href="/" className="text-sm text-slate-600 hover:text-slate-900 hover:underline">
           Back to tickets
@@ -430,6 +432,7 @@ export default function TicketDetailPage() {
           </section>
         </div>
       )}
-    </main>
+      </main>
+    </AppShell>
   );
 }

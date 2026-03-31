@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { Category, createCategory, fetchCategories, Queue, updateCategory } from "../../lib/api";
+import { AppShell } from "../../components/layout/app-shell";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -60,7 +61,8 @@ export default function CategoriesPage() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl p-4 md:p-6">
+    <AppShell>
+      <main className="mx-auto max-w-5xl p-4 md:p-6">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-xl font-semibold text-slate-900">Categories</h1>
         <Link href="/" className="text-sm text-slate-700 underline-offset-2 hover:underline">
@@ -156,6 +158,7 @@ export default function CategoriesPage() {
           </div>
         )}
       </section>
-    </main>
+      </main>
+    </AppShell>
   );
 }
