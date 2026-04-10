@@ -53,6 +53,8 @@ export function ConversationThread({
         {/* Activity feed */}
         {loading ? (
           <p className="text-sm text-slate-500">Loading activity...</p>
+        ) : notes.length === 0 ? (
+          <p className="text-sm text-slate-400">No replies or notes yet.</p>
         ) : (
           notes.map((note) => (
             <div
@@ -60,7 +62,7 @@ export function ConversationThread({
               className={`rounded-lg border p-4 ${
                 note.message_type === "public_reply"
                   ? "border-blue-200 bg-blue-50"
-                  : "border-l-4 border-emerald-400 border-emerald-200 bg-emerald-50"
+                  : "border border-emerald-200 border-l-4 border-l-emerald-400 bg-emerald-50"
               }`}
             >
               <div className="mb-1 flex items-baseline gap-2">
