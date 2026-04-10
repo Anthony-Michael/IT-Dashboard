@@ -58,11 +58,14 @@ export function TicketWorkspace({
   }, [ticketId]);
 
   async function refreshNotes() {
+    setNotesLoading(true);
     try {
       const refreshed = await fetchTicketNotes(ticketId);
       setNotes(refreshed);
     } catch {
       // non-fatal — composer shows its own error
+    } finally {
+      setNotesLoading(false);
     }
   }
 
