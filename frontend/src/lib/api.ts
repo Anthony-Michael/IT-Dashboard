@@ -24,7 +24,6 @@ export interface Ticket {
   assignee_name?: string | null;
   category_id?: string | null;
   category_name?: string | null;
-  submitted_at?: string | null;
   created_at: string;
 }
 
