@@ -18,6 +18,12 @@ export function ReplyComposer({
   const [error, setError] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
 
+  function switchMode(m: Mode) {
+    setMode(m);
+    setStatusMsg("");
+    setError("");
+  }
+
   async function handleSend() {
     const trimmed = body.trim();
     if (!trimmed) return;
@@ -52,7 +58,7 @@ export function ReplyComposer({
       <div className="flex border-b border-slate-100">
         <button
           type="button"
-          onClick={() => setMode("reply")}
+          onClick={() => switchMode("reply")}
           className={`px-4 py-2 text-sm font-medium transition-colors ${
             mode === "reply"
               ? "bg-blue-600 text-white"
@@ -63,7 +69,7 @@ export function ReplyComposer({
         </button>
         <button
           type="button"
-          onClick={() => setMode("note")}
+          onClick={() => switchMode("note")}
           className={`px-4 py-2 text-sm font-medium transition-colors ${
             mode === "note"
               ? "bg-emerald-600 text-white"
