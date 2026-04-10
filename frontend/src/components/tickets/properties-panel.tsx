@@ -12,6 +12,8 @@ const TICKET_STATUS_OPTIONS: { value: TicketStatus; label: string }[] = [
   { value: "closed", label: "Closed" },
 ];
 
+// MVP shortcut: static assignee list seeded in scripts/seed-internal-users.ts.
+// Keep in sync with frontend/src/app/tickets/[id]/page.tsx until a /users API exists.
 const ASSIGNEE_OPTIONS = [
   { label: "Unassigned", value: "" },
   { label: "Anthony (IT)", value: "11111111-1111-4111-8111-111111111111" },
@@ -72,7 +74,7 @@ export function PropertiesPanel({
       </div>
 
       {/* Scrollable properties */}
-      <div className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
+      <div className={`flex-1 space-y-4 overflow-y-auto px-3 py-4 transition-opacity ${saving ? "opacity-60" : "opacity-100"}`}>
         {/* Requester — read only */}
         <div>
           <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">
@@ -176,6 +178,9 @@ export function PropertiesPanel({
           </p>
         </div>
 
+        {saving ? (
+          <p className="text-xs text-slate-400">Saving...</p>
+        ) : null}
         {error ? <p className="text-xs text-rose-600">{error}</p> : null}
       </div>
     </div>
