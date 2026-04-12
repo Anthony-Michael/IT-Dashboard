@@ -1,373 +1,117 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import {
-  ApprovalStatus,
-  Category,
-  fetchCategories,
-  fetchTickets,
-  Queue,
-  Ticket,
-  TicketStatus
-} from "../lib/api";
-import { StatusBadge } from "../components/tickets/status-badge";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Category, fetchCategories } from "../lib/api";
 import { AppShell } from "../components/layout/app-shell";
 import { SidebarItemId, ViewsSidebar } from "../components/layout/views-sidebar";
-
-const PAGE_SIZE = 10;
-const CURRENT_USER = "Anthony";
-const CURRENT_USER_ID = "11111111-1111-4111-8111-111111111111";
-
-type Filters = {
-  approval_status: ApprovalStatus | "";
-  queue: Queue | "";
-  ticket_status: TicketStatus | "";
-  category_id: string | "";
-};
+import { Filters, TicketListPanel } from "../components/tickets/ticket-list-panel";
+import { TicketWorkspace } from "../components/tickets/ticket-workspace";
 
 const initialFilters: Filters = {
   approval_status: "",
   queue: "",
   ticket_status: "",
-  category_id: ""
+  category_id: "",
 };
 
-function formatDate(value: string): string {
-  return new Date(value).toLocaleString();
-}
-
-function getDisplaySubmittedAt(ticket: Ticket): string {
-  return ticket.submitted_at || ticket.created_at;
-}
-
-function isAssignedToCurrentUser(ticket: Ticket): boolean {
-  const assigneeName = (ticket.assignee_name || "").trim().toLowerCase();
-  if (assigneeName && assigneeName === CURRENT_USER.toLowerCase()) {
-    return true;
-  }
-  return ticket.assignee_user_id === CURRENT_USER_ID;
+function filtersForSidebarItem(itemId: SidebarItemId): Filters {
+  const next: Filters = {
+    approval_status: "",
+    queue: "",
+    ticket_status: "",
+    category_id: "",
+  };
+  if (itemId === "pending_approval") next.approval_status = "pending_approval";
+  else if (itemId === "queue_it") next.queue = "it";
+  else if (itemId === "queue_operations") next.queue = "operations";
+  else if (itemId === "status_new") next.ticket_status = "new";
+  else if (itemId === "status_in_progress") next.ticket_status = "in_progress";
+  else if (itemId === "status_waiting_on_requester")
+    next.ticket_status = "waiting_on_requester";
+  else if (itemId === "status_resolved") next.ticket_status = "resolved";
+  return next;
 }
 
 export default function TicketsPage() {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>("");
-  const [filters, setFilters] = useState<Filters>(initialFilters);
+  const router = useRouter();
+
   const [categories, setCategories] = useState<Category[]>([]);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [activeSidebarItem, setActiveSidebarItem] = useState<SidebarItemId | null>("all_tickets");
+  const [filters, setFilters] = useState<Filters>(initialFilters);
+  const [activeSidebarItem, setActiveSidebarItem] =
+    useState<SidebarItemId | null>("all_tickets");
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [backLabel, setBackLabel] = useState("Tickets");
 
   useEffect(() => {
     let active = true;
-
-    async function loadCategories(): Promise<void> {
-      try {
-        const data = await fetchCategories();
-        if (!active) return;
-        setCategories(data);
-      } catch {
-        if (!active) return;
-        setCategories([]);
-      }
-    }
-
-    loadCategories();
+    fetchCategories()
+      .then((data) => {
+        if (active) setCategories(data);
+      })
+      .catch(() => {
+        if (active) setCategories([]);
+      });
     return () => {
       active = false;
     };
   }, []);
 
-  useEffect(() => {
-    let active = true;
+  function handleSidebarSelect(itemId: SidebarItemId) {
+    setActiveSidebarItem(itemId);
+    setFilters(filtersForSidebarItem(itemId));
+  }
 
-    async function load(): Promise<void> {
-      setLoading(true);
-      setError("");
-
-      try {
-        const result = await fetchTickets({ ...filters, page, limit: PAGE_SIZE });
-        if (!active) return;
-
-        setTickets(result.data);
-        setTotal(result.total);
-      } catch (err) {
-        if (!active) return;
-        setError(err instanceof Error ? err.message : "Failed to load tickets");
-      } finally {
-        if (active) setLoading(false);
-      }
-    }
-
-    load();
-    return () => {
-      active = false;
-    };
-  }, [filters, page, refreshKey]);
-
-  function updateFilter<K extends keyof Filters>(key: K, value: Filters[K]) {
-    // Reset page when filters change to avoid requesting empty pages from prior pagination state.
-    setPage(1);
+  function handleFilterChange(
+    key: keyof Filters,
+    value: Filters[keyof Filters]
+  ) {
     setActiveSidebarItem(null);
     setFilters((prev) => ({ ...prev, [key]: value }));
   }
 
-  function applySidebarView(itemId: SidebarItemId): void {
-    setPage(1);
-    setActiveSidebarItem(itemId);
-
-    setFilters((prev) => {
-      const next = { ...prev };
-
-      if (itemId === "all_tickets") {
-        next.approval_status = "";
-        next.queue = "";
-        next.ticket_status = "";
-        return next;
-      }
-
-      next.approval_status = "";
-      next.queue = "";
-      next.ticket_status = "";
-
-      if (itemId === "pending_approval") {
-        next.approval_status = "pending_approval";
-      } else if (itemId === "queue_it") {
-        next.queue = "it";
-      } else if (itemId === "queue_operations") {
-        next.queue = "operations";
-      } else if (itemId === "status_new") {
-        next.ticket_status = "new";
-      } else if (itemId === "status_in_progress") {
-        next.ticket_status = "in_progress";
-      } else if (itemId === "status_waiting_on_requester") {
-        next.ticket_status = "waiting_on_requester";
-      } else if (itemId === "status_resolved") {
-        next.ticket_status = "resolved";
-      }
-
-      return next;
-    });
+  function handleTicketSelect(ticketId: string, label: string) {
+    setSelectedTicketId(ticketId);
+    setBackLabel(label);
+    router.replace(`/?ticket=${ticketId}`, { scroll: false });
   }
 
-  const displayedTickets = useMemo(() => {
-    if (activeSidebarItem !== "unassigned") {
-      if (activeSidebarItem === "my_tickets") {
-        return tickets.filter(isAssignedToCurrentUser);
-      }
-      return tickets;
-    }
-    return tickets.filter((ticket) => !ticket.assignee_user_id);
-  }, [activeSidebarItem, tickets]);
-
-  const isClientSideCountView = activeSidebarItem === "unassigned" || activeSidebarItem === "my_tickets";
-  const displayedTotal = isClientSideCountView ? displayedTickets.length : total;
-
-  const totalPages = useMemo(() => {
-    if (isClientSideCountView) return 1;
-    if (total <= 0) return 1;
-    return Math.ceil(total / PAGE_SIZE);
-  }, [isClientSideCountView, total]);
-
-  const canGoPrevious = page > 1;
-  const canGoNext = page < totalPages;
+  function handleBack() {
+    setSelectedTicketId(null);
+    router.replace("/", { scroll: false });
+  }
 
   return (
     <AppShell>
-      <main className="p-4 md:p-6">
-        <div className="mx-auto flex max-w-[1280px] gap-4 lg:items-start">
-          <aside className="sticky top-6 hidden w-[240px] shrink-0 self-start lg:block">
-            <ViewsSidebar activeItem={activeSidebarItem} onSelect={applySidebarView} />
-          </aside>
+      <div className="flex h-screen overflow-hidden">
+        {/* Views sidebar */}
+        <aside className="hidden w-[220px] flex-shrink-0 overflow-y-auto border-r border-slate-200 bg-white p-3 lg:block">
+          <ViewsSidebar
+            activeItem={activeSidebarItem}
+            onSelect={handleSidebarSelect}
+          />
+        </aside>
 
-          <div className="min-w-0 flex-1">
-            <header className="mb-4">
-              <h1 className="text-xl font-semibold text-slate-900">Tickets</h1>
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-sm text-slate-600">Phase 1 ticket list with filters and pagination.</p>
-                <Link href="/categories" className="text-sm text-slate-700 underline-offset-2 hover:underline">
-                  Manage Categories
-                </Link>
-              </div>
-            </header>
-
-            <section className="mb-4 grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-white p-4 md:grid-cols-4">
-              <label className="text-sm">
-                <span className="mb-1 block text-slate-700">Approval Status</span>
-                <select
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                  value={filters.approval_status}
-                  onChange={(e) => updateFilter("approval_status", e.target.value as Filters["approval_status"])}
-                >
-                  <option value="">All</option>
-                  <option value="pending_approval">Pending Approval</option>
-                  <option value="approved">Approved</option>
-                  <option value="denied">Denied</option>
-                </select>
-              </label>
-
-              <label className="text-sm">
-                <span className="mb-1 block text-slate-700">Queue</span>
-                <select
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                  value={filters.queue}
-                  onChange={(e) => updateFilter("queue", e.target.value as Filters["queue"])}
-                >
-                  <option value="">All</option>
-                  <option value="it">IT</option>
-                  <option value="operations">Operations</option>
-                </select>
-              </label>
-
-              <label className="text-sm">
-                <span className="mb-1 block text-slate-700">Ticket Status</span>
-                <select
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                  value={filters.ticket_status}
-                  onChange={(e) => updateFilter("ticket_status", e.target.value as Filters["ticket_status"])}
-                >
-                  <option value="">All</option>
-                  <option value="new">New</option>
-                  <option value="triage">Triage</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="waiting_on_requester">Waiting on Requester</option>
-                  <option value="resolved">Resolved</option>
-                  <option value="closed">Closed</option>
-                </select>
-              </label>
-
-              <label className="text-sm">
-                <span className="mb-1 block text-slate-700">Category</span>
-                <select
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
-                  value={filters.category_id}
-                  onChange={(e) => updateFilter("category_id", e.target.value)}
-                >
-                  <option value="">All</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </section>
-
-            {activeSidebarItem === "recently_updated" ? (
-              <div className="mb-4 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-                Recently Updated sorting is a placeholder in MVP (backend currently sorts by created date).
-              </div>
-            ) : null}
-
-            {activeSidebarItem === "unassigned" ? (
-              <div className="mb-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-                Unassigned view is filtered client-side from current page results.
-              </div>
-            ) : null}
-
-            {activeSidebarItem === "my_tickets" ? (
-              <div className="mb-4 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-                My Tickets view is filtered client-side for {CURRENT_USER}.
-              </div>
-            ) : null}
-
-            {error ? (
-              <div className="mb-4 rounded-md border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
-                <p className="mb-2">{error}</p>
-                <button
-                  type="button"
-                  onClick={() => setRefreshKey((prev) => prev + 1)}
-                  className="rounded-md border border-rose-300 bg-white px-3 py-1 text-xs text-rose-700"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : null}
-
-            {loading ? (
-              <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">Loading tickets...</div>
-            ) : displayedTickets.length === 0 ? (
-              <div className="rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-600">
-                {activeSidebarItem === "my_tickets" ? `No tickets assigned to ${CURRENT_USER}` : "No tickets found."}
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-slate-50">
-                      <tr className="text-left text-xs uppercase tracking-wide text-slate-600">
-                        <th className="px-3 py-2">Subject</th>
-                        <th className="px-3 py-2">Requester Name</th>
-                        <th className="px-3 py-2">Requester Email</th>
-                        <th className="px-3 py-2">Assignee</th>
-                        <th className="px-3 py-2">Category</th>
-                        <th className="px-3 py-2">Queue</th>
-                        <th className="px-3 py-2">Approval</th>
-                        <th className="px-3 py-2">Status</th>
-                        <th className="px-3 py-2">Priority</th>
-                        <th className="px-3 py-2">Submitted At</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {displayedTickets.map((ticket) => (
-                        <tr key={ticket.id} className="border-t border-slate-100 align-top hover:bg-slate-50">
-                          <td className="px-3 py-2 font-medium text-slate-900">
-                            <Link href={`/tickets/${ticket.id}`} className="underline-offset-2 hover:underline">
-                              {ticket.subject}
-                            </Link>
-                          </td>
-                          <td className="px-3 py-2 text-slate-700">{ticket.requester_name}</td>
-                          <td className="px-3 py-2 text-slate-700">{ticket.requester_email}</td>
-                          <td className="px-3 py-2 text-slate-700">{ticket.assignee_name || "Unassigned"}</td>
-                          <td className="px-3 py-2 text-slate-700">{ticket.category_name || ""}</td>
-                          <td className="px-3 py-2">
-                            <StatusBadge value={ticket.queue} />
-                          </td>
-                          <td className="px-3 py-2">
-                            <StatusBadge value={ticket.approval_status} />
-                          </td>
-                          <td className="px-3 py-2">
-                            <StatusBadge value={ticket.ticket_status} />
-                          </td>
-                          <td className="px-3 py-2 text-slate-700">{ticket.priority}</td>
-                          <td className="px-3 py-2 text-slate-700">{formatDate(getDisplaySubmittedAt(ticket))}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-sm text-slate-600">
-                    Page {page} of {totalPages} ({displayedTotal} total)
-                  </p>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      className="rounded-md border border-slate-300 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-                      onClick={() => setPage((prev) => prev - 1)}
-                      disabled={!canGoPrevious}
-                    >
-                      Previous
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-md border border-slate-300 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-                      onClick={() => setPage((prev) => prev + 1)}
-                      disabled={!canGoNext}
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
+        {/* Main content area — list or workspace */}
+        <div className="flex flex-1 overflow-hidden">
+          {selectedTicketId ? (
+            <TicketWorkspace
+              ticketId={selectedTicketId}
+              categories={categories}
+              backLabel={backLabel}
+              onBack={handleBack}
+            />
+          ) : (
+            <TicketListPanel
+              filters={filters}
+              activeSidebarItem={activeSidebarItem}
+              categories={categories}
+              onTicketSelect={handleTicketSelect}
+              onFilterChange={handleFilterChange}
+            />
+          )}
         </div>
-      </main>
+      </div>
     </AppShell>
   );
 }
