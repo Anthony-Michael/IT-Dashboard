@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { logout } from "../../lib/auth";
 
 type RailItem = {
   label: string;
@@ -26,6 +27,12 @@ function isActive(pathname: string, href: string): boolean {
 
 export function IconRail() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    await logout();
+    router.replace("/login");
+  }
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 w-16 border-r border-slate-200 bg-white/95 backdrop-blur">
@@ -72,6 +79,17 @@ export function IconRail() {
             );
           })}
         </nav>
+
+        {/* Logout at bottom of rail */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          title="Sign out"
+          className="mt-auto flex h-11 w-11 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-rose-50 hover:text-rose-600"
+        >
+          <span aria-hidden className="text-sm font-semibold">⏻</span>
+          <span className="sr-only">Sign out</span>
+        </button>
       </div>
     </aside>
   );

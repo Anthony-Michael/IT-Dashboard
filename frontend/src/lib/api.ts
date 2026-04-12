@@ -66,6 +66,12 @@ export interface Category {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
 
+function authHeaders(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("auth_token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 async function readErrorMessage(response: Response): Promise<string> {
   try {
     // Backend sends { error: { message } }; fallback keeps client robust to non-JSON failures.
@@ -90,6 +96,7 @@ export async function fetchTickets(query: TicketQuery): Promise<TicketsResponse>
   // no-store avoids stale triage state in this internal dashboard workflow.
   const response = await fetch(`${API_BASE_URL}/tickets?${params.toString()}`, {
     method: "GET",
+    headers: { ...authHeaders() },
     cache: "no-store"
   });
 
@@ -103,6 +110,7 @@ export async function fetchTickets(query: TicketQuery): Promise<TicketsResponse>
 export async function fetchTicketById(id: string): Promise<Ticket> {
   const response = await fetch(`${API_BASE_URL}/tickets/${id}`, {
     method: "GET",
+    headers: { ...authHeaders() },
     cache: "no-store"
   });
 
@@ -126,7 +134,8 @@ export async function updateTicket(
   const response = await fetch(`${API_BASE_URL}/tickets/${id}`, {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...authHeaders(),
     },
     body: JSON.stringify(payload)
   });
@@ -148,6 +157,7 @@ export async function fetchCategories(includeInactive = false): Promise<Category
 
   const response = await fetch(`${API_BASE_URL}/categories?${params.toString()}`, {
     method: "GET",
+    headers: { ...authHeaders() },
     cache: "no-store"
   });
 
@@ -162,7 +172,8 @@ export async function createCategory(payload: { name: string; queue: Queue }): P
   const response = await fetch(`${API_BASE_URL}/categories`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...authHeaders(),
     },
     body: JSON.stringify(payload)
   });
@@ -181,7 +192,8 @@ export async function updateCategory(
   const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
     method: "PATCH",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...authHeaders(),
     },
     body: JSON.stringify(payload)
   });
@@ -196,6 +208,7 @@ export async function updateCategory(
 export async function fetchTicketNotes(ticketId: string): Promise<TicketNote[]> {
   const response = await fetch(`${API_BASE_URL}/tickets/${ticketId}/notes`, {
     method: "GET",
+    headers: { ...authHeaders() },
     cache: "no-store"
   });
 
@@ -210,7 +223,8 @@ export async function addTicketNote(ticketId: string, body: string): Promise<Tic
   const response = await fetch(`${API_BASE_URL}/tickets/${ticketId}/notes`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...authHeaders(),
     },
     body: JSON.stringify({ body })
   });
@@ -230,7 +244,8 @@ export async function sendTicketReply(
   const response = await fetch(`${API_BASE_URL}/tickets/${ticketId}/reply`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      ...authHeaders(),
     },
     body: JSON.stringify({ body })
   });
