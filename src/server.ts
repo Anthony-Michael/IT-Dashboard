@@ -1,8 +1,12 @@
 import dotenv from "dotenv";
 import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
+import bcrypt from "bcryptjs";
 import { pool, testDbConnection } from "./db";
 import { sendEmail } from "./email/sender";
+import { findUserByUsername } from "./auth/users";
+import { signToken } from "./auth/jwt";
+import { requireAuth } from "./middleware/require-auth";
 
 dotenv.config();
 
@@ -32,6 +36,7 @@ const ALLOWED_CORS_ORIGINS = (process.env.CORS_ALLOWED_ORIGINS || "http://localh
 type ApiErrorCode =
   | "BAD_REQUEST"
   | "NOT_FOUND"
+  | "UNAUTHORIZED"
   | "INTERNAL_ERROR";
 
 function sendError(res: Response, status: number, message: string, code: ApiErrorCode) {
@@ -47,7 +52,9 @@ function sendError(res: Response, status: number, message: string, code: ApiErro
 app.use(
   cors({
     origin: ALLOWED_CORS_ORIGINS,
-    methods: ["GET", "POST", "PATCH", "OPTIONS"]
+    methods: ["GET", "POST", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 app.use(express.json());
@@ -81,7 +88,63 @@ app.get("/health", async (_req, res) => {
   }
 });
 
-app.get("/tickets", async (req, res) => {
+// ── Auth routes (public) ───────────────────────────────────────────────────
+
+app.post("/auth/login", async (req, res) => {
+  const username = typeof req.body?.username === "string" ? req.body.username.trim() : "";
+  const password = typeof req.body?.password === "string" ? req.body.password : "";
+
+  if (!username || !password) {
+    return sendError(res, 400, "username and password are required", "BAD_REQUEST");
+  }
+
+  let user;
+  try {
+    user = findUserByUsername(username);
+  } catch (err) {
+    return sendError(res, 500, (err as Error).message, "INTERNAL_ERROR");
+  }
+
+  if (!user) {
+    return sendError(res, 401, "Invalid username or password", "UNAUTHORIZED");
+  }
+
+  const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+  if (!passwordMatch) {
+    return sendError(res, 401, "Invalid username or password", "UNAUTHORIZED");
+  }
+
+  const token = signToken({
+    userId: user.id,
+    username: user.username,
+    fullName: user.fullName,
+    role: user.role,
+  });
+
+  return res.status(200).json({
+    ok: true,
+    token,
+    user: {
+      id: user.id,
+      username: user.username,
+      fullName: user.fullName,
+      role: user.role,
+    },
+  });
+});
+
+app.post("/auth/logout", (_req, res) => {
+  // Stateless JWT — client is responsible for discarding the token.
+  return res.status(200).json({ ok: true });
+});
+
+app.get("/auth/me", requireAuth, (req, res) => {
+  return res.status(200).json({ ok: true, user: req.user });
+});
+
+// ── Protected routes ───────────────────────────────────────────────────────
+
+app.get("/tickets", requireAuth, async (req, res) => {
   try {
     const approvalStatus = req.query.approval_status as string | undefined;
     const queue = req.query.queue as string | undefined;
@@ -183,7 +246,7 @@ app.get("/tickets", async (req, res) => {
   }
 });
 
-app.get("/tickets/:id", async (req, res) => {
+app.get("/tickets/:id", requireAuth, async (req, res) => {
   const ticketId = req.params.id;
 
   if (!isUuid(ticketId)) {
@@ -228,7 +291,7 @@ app.get("/tickets/:id", async (req, res) => {
   }
 });
 
-app.patch("/tickets/:id", async (req, res) => {
+app.patch("/tickets/:id", requireAuth, async (req, res) => {
   const ticketId = req.params.id;
 
   if (!isUuid(ticketId)) {
@@ -362,7 +425,7 @@ app.patch("/tickets/:id", async (req, res) => {
   }
 });
 
-app.get("/categories", async (req, res) => {
+app.get("/categories", requireAuth, async (req, res) => {
   const includeInactive = (req.query.include_inactive as string | undefined) === "true";
 
   try {
@@ -380,7 +443,7 @@ app.get("/categories", async (req, res) => {
   }
 });
 
-app.post("/categories", async (req, res) => {
+app.post("/categories", requireAuth, async (req, res) => {
   const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
   const queue = req.body?.queue as string | undefined;
 
@@ -405,7 +468,7 @@ app.post("/categories", async (req, res) => {
   }
 });
 
-app.patch("/categories/:id", async (req, res) => {
+app.patch("/categories/:id", requireAuth, async (req, res) => {
   const categoryId = req.params.id;
 
   if (!isUuid(categoryId)) {
@@ -466,7 +529,7 @@ app.patch("/categories/:id", async (req, res) => {
   }
 });
 
-app.get("/tickets/:id/notes", async (req, res) => {
+app.get("/tickets/:id/notes", requireAuth, async (req, res) => {
   const ticketId = req.params.id;
 
   if (!isUuid(ticketId)) {
@@ -498,7 +561,7 @@ app.get("/tickets/:id/notes", async (req, res) => {
   }
 });
 
-app.post("/tickets/:id/notes", async (req, res) => {
+app.post("/tickets/:id/notes", requireAuth, async (req, res) => {
   const ticketId = req.params.id;
 
   if (!isUuid(ticketId)) {
@@ -551,7 +614,7 @@ app.post("/tickets/:id/notes", async (req, res) => {
   }
 });
 
-app.post("/tickets/:id/reply", async (req, res) => {
+app.post("/tickets/:id/reply", requireAuth, async (req, res) => {
   const ticketId = req.params.id;
 
   if (!isUuid(ticketId)) {
