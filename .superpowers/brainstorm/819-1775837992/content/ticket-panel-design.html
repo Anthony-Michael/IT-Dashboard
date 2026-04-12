@@ -1,0 +1,108 @@
+<h2>Ticket Detail Panel — Right Column</h2>
+<p class="subtitle">When you click a ticket, what does the right panel look like?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="zendesk-split" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;height:200px;font-size:10px;background:#f1f5f9;padding:6px;border-radius:6px;overflow:hidden;gap:4px">
+        <!-- Conversation thread -->
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px;overflow:hidden">
+          <div style="font-weight:700;color:#0f172a;font-size:11px;padding:4px 0 2px">Printer not working</div>
+          <div style="font-size:9px;color:#64748b;margin-bottom:4px">Sarah Martinez &bull; sarah@company.com &bull; Submitted Apr 9</div>
+          <!-- Messages -->
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:5px;flex-shrink:0">
+            <span style="font-weight:600;color:#374151">Sarah:</span>
+            <span style="color:#4b5563"> The printer on floor 3 shows offline every morning. I've tried turning it off and on...</span>
+          </div>
+          <div style="background:#eff6ff;border:1px solid #dbeafe;border-radius:4px;padding:5px;flex-shrink:0">
+            <span style="font-weight:600;color:#1d4ed8">Anthony (you):</span>
+            <span style="color:#1e40af"> Have you tried restarting the print spooler service? Start → Run → services.msc</span>
+          </div>
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;padding:5px;font-size:9px;color:#475569;flex-shrink:0">
+            <span style="font-style:italic;color:#64748b">🔒 Internal note — Anthony:</span>
+            <span style="color:#374151"> Looks like a recurring issue with the HP 4015. May need firmware update.</span>
+          </div>
+          <!-- Reply box -->
+          <div style="margin-top:auto;border:1px solid #e2e8f0;border-radius:4px;overflow:hidden;flex-shrink:0">
+            <div style="display:flex;gap:0;border-bottom:1px solid #e2e8f0">
+              <div style="padding:3px 8px;background:#2563eb;color:#fff;font-size:9px;cursor:pointer">Reply</div>
+              <div style="padding:3px 8px;color:#64748b;font-size:9px;cursor:pointer">Internal Note</div>
+            </div>
+            <div style="padding:5px;color:#94a3b8;font-size:9px">Type your reply to Sarah...</div>
+          </div>
+        </div>
+        <!-- Properties sidebar -->
+        <div style="width:90px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:6px;flex-shrink:0">
+          <div style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Properties</div>
+          <div style="margin-bottom:5px">
+            <div style="font-size:8px;color:#94a3b8;margin-bottom:1px">Status</div>
+            <div style="background:#fef9c3;color:#854d0e;padding:2px 5px;border-radius:10px;font-size:9px;display:inline-block">In Progress</div>
+          </div>
+          <div style="margin-bottom:5px">
+            <div style="font-size:8px;color:#94a3b8;margin-bottom:1px">Priority</div>
+            <div style="background:#fef2f2;color:#b91c1c;padding:2px 5px;border-radius:10px;font-size:9px;display:inline-block">High</div>
+          </div>
+          <div style="margin-bottom:5px">
+            <div style="font-size:8px;color:#94a3b8;margin-bottom:1px">Assignee</div>
+            <div style="font-size:9px;color:#374151">Anthony</div>
+          </div>
+          <div style="margin-bottom:5px">
+            <div style="font-size:8px;color:#94a3b8;margin-bottom:1px">Queue</div>
+            <div style="font-size:9px;color:#374151">IT</div>
+          </div>
+          <div>
+            <div style="font-size:8px;color:#94a3b8;margin-bottom:1px">Category</div>
+            <div style="font-size:9px;color:#374151">Hardware</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A &mdash; Conversation + Properties Sidebar</h3>
+      <p>Conversation thread takes up most of the panel. Ticket properties (status, priority, assignee, queue, category) live in a narrow sidebar on the right. Closest to Zendesk.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="stacked" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;flex-direction:column;height:200px;font-size:10px;background:#f1f5f9;padding:6px;border-radius:6px;overflow:hidden;gap:4px">
+        <!-- Header with properties inline -->
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:6px;flex-shrink:0">
+          <div style="font-weight:700;color:#0f172a;font-size:11px;margin-bottom:4px">Printer not working</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <span style="background:#fef9c3;color:#854d0e;padding:2px 6px;border-radius:10px;font-size:9px">In Progress</span>
+            <span style="background:#fef2f2;color:#b91c1c;padding:2px 6px;border-radius:10px;font-size:9px">High</span>
+            <span style="background:#f0fdf4;color:#166534;padding:2px 6px;border-radius:10px;font-size:9px">IT Queue</span>
+            <span style="background:#eff6ff;color:#1d4ed8;padding:2px 6px;border-radius:10px;font-size:9px">Anthony</span>
+            <span style="background:#faf5ff;color:#6d28d9;padding:2px 6px;border-radius:10px;font-size:9px">Hardware</span>
+          </div>
+        </div>
+        <!-- Conversation -->
+        <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;gap:3px">
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;padding:4px;font-size:9px">
+            <span style="font-weight:600">Sarah:</span> The printer on floor 3 shows offline every morning...
+          </div>
+          <div style="background:#eff6ff;border:1px solid #dbeafe;border-radius:4px;padding:4px;font-size:9px">
+            <span style="font-weight:600;color:#1d4ed8">Anthony:</span> Have you tried restarting the print spooler?
+          </div>
+        </div>
+        <!-- Reply box -->
+        <div style="border:1px solid #e2e8f0;border-radius:4px;overflow:hidden;flex-shrink:0">
+          <div style="display:flex;border-bottom:1px solid #e2e8f0">
+            <div style="padding:3px 8px;background:#2563eb;color:#fff;font-size:9px">Reply</div>
+            <div style="padding:3px 8px;color:#64748b;font-size:9px">Internal Note</div>
+          </div>
+          <div style="padding:4px;color:#94a3b8;font-size:9px">Type your reply...</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B &mdash; Properties on Top, Thread Below</h3>
+      <p>Ticket metadata shown as pills at the top. Full width for the conversation thread below. More vertical space for the thread, but properties are less editable at a glance.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">Both have the reply/internal note toggle. A gives more room to edit properties inline. Which feels better?</p>

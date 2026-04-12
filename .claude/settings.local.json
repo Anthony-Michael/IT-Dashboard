@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude install:*)",
+      "Bash(cat .superpowers/brainstorm/*/state/server-info)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Read(//c/Users/Anthony/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/subagent-driven-development/**)",
+      "Bash(npm run:*)",
+      "Read(//tmp/**)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(kill %1)"
+    ]
+  }
+}

@@ -1,0 +1,91 @@
+<h2>Ticket Workspace Layout</h2>
+<p class="subtitle">The heart of the Zendesk feel — what happens when you open a ticket?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="three-col" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;height:160px;font-size:11px;gap:2px;background:#f1f5f9;padding:6px;border-radius:6px;overflow:hidden">
+        <div style="width:90px;background:#1e293b;color:#94a3b8;padding:6px;border-radius:4px;flex-shrink:0">
+          <div style="color:#e2e8f0;font-weight:600;margin-bottom:8px;font-size:10px">VIEWS</div>
+          <div style="background:#334155;color:#f1f5f9;padding:3px 5px;border-radius:3px;margin-bottom:3px">IT Queue</div>
+          <div style="padding:3px 5px;margin-bottom:3px">Ops Queue</div>
+          <div style="padding:3px 5px;margin-bottom:3px">Pending</div>
+          <div style="padding:3px 5px">My Tickets</div>
+        </div>
+        <div style="width:130px;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:6px;flex-shrink:0;overflow:hidden">
+          <div style="font-weight:600;font-size:10px;color:#475569;margin-bottom:6px">12 tickets</div>
+          <div style="background:#eff6ff;border-left:3px solid #3b82f6;padding:4px;margin-bottom:3px;cursor:pointer;border-radius:2px">
+            <div style="font-weight:600;color:#1e40af;font-size:9px">Printer not working</div>
+            <div style="color:#64748b;font-size:9px">Sarah M.</div>
+          </div>
+          <div style="border-left:3px solid #e2e8f0;padding:4px;margin-bottom:3px;cursor:pointer">
+            <div style="font-weight:600;color:#0f172a;font-size:9px">VPN access needed</div>
+            <div style="color:#64748b;font-size:9px">James T.</div>
+          </div>
+          <div style="border-left:3px solid #e2e8f0;padding:4px;cursor:pointer">
+            <div style="font-weight:600;color:#0f172a;font-size:9px">New laptop setup</div>
+            <div style="color:#64748b;font-size:9px">Maria L.</div>
+          </div>
+        </div>
+        <div style="flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:8px;overflow:hidden">
+          <div style="font-weight:700;color:#0f172a;font-size:10px;margin-bottom:4px">Printer not working</div>
+          <div style="font-size:9px;color:#64748b;margin-bottom:6px">Sarah M. &bull; High &bull; IT Queue</div>
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:3px;padding:5px;font-size:9px;color:#374151;margin-bottom:5px">
+            <b>Sarah:</b> The printer on floor 3 keeps showing offline...
+          </div>
+          <div style="background:#eff6ff;border:1px solid #dbeafe;border-radius:3px;padding:5px;font-size:9px;color:#1d4ed8;margin-bottom:5px">
+            <b>Anthony:</b> Have you tried restarting the print spooler?
+          </div>
+          <div style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:3px;padding:4px;font-size:9px;color:#475569">
+            Type a reply...
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A &mdash; Three-Column (Zendesk Classic)</h3>
+      <p>Views sidebar + ticket list + open ticket — all visible at once. Switch tickets without losing context. Most like Zendesk.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="two-col" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="display:flex;height:160px;font-size:11px;gap:2px;background:#f1f5f9;padding:6px;border-radius:6px;overflow:hidden">
+        <div style="width:90px;background:#1e293b;color:#94a3b8;padding:6px;border-radius:4px;flex-shrink:0">
+          <div style="color:#e2e8f0;font-weight:600;margin-bottom:8px;font-size:10px">VIEWS</div>
+          <div style="background:#334155;color:#f1f5f9;padding:3px 5px;border-radius:3px;margin-bottom:3px">IT Queue</div>
+          <div style="padding:3px 5px;margin-bottom:3px">Ops Queue</div>
+          <div style="padding:3px 5px;margin-bottom:3px">Pending</div>
+          <div style="padding:3px 5px">My Tickets</div>
+        </div>
+        <div style="flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:4px;padding:8px;overflow:hidden">
+          <div style="font-weight:600;font-size:10px;color:#475569;margin-bottom:6px">IT Queue &mdash; 12 tickets</div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px;align-items:center;border-bottom:1px solid #e2e8f0;padding-bottom:4px;margin-bottom:4px;font-size:9px;color:#64748b;font-weight:600">
+            <span>Subject</span><span>Assignee</span><span>Priority</span><span>Status</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px;align-items:center;margin-bottom:3px;font-size:9px;cursor:pointer">
+            <span style="color:#2563eb;text-decoration:underline">Printer not working</span>
+            <span style="color:#374151">Anthony</span>
+            <span style="background:#fef2f2;color:#b91c1c;padding:1px 4px;border-radius:10px">High</span>
+            <span style="background:#fef9c3;color:#854d0e;padding:1px 4px;border-radius:10px">Open</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:4px;align-items:center;font-size:9px;cursor:pointer">
+            <span style="color:#2563eb;text-decoration:underline">VPN access needed</span>
+            <span style="color:#94a3b8">—</span>
+            <span style="background:#f0fdf4;color:#166534;padding:1px 4px;border-radius:10px">Low</span>
+            <span style="background:#eff6ff;color:#1d4ed8;padding:1px 4px;border-radius:10px">New</span>
+          </div>
+          <div style="margin-top:8px;font-size:9px;color:#94a3b8;text-align:center">↑ Click ticket → opens full page</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B &mdash; Two-Column + Full-Page Ticket</h3>
+      <p>Views sidebar + ticket list. Clicking a ticket opens a full-page detail view. Cleaner list, more room for ticket content.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">A is closer to Zendesk. B is what the current dashboard does. Which feels right for how you work?</p>

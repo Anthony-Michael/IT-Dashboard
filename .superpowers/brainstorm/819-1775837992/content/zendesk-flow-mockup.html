@@ -1,0 +1,208 @@
+<h2>Updated Layout — Two States</h2>
+<p class="subtitle">State 1: ticket list. State 2: clicking a ticket replaces the list with the full workspace. Back button returns to list.</p>
+
+<div style="display:flex;gap:20px;flex-wrap:wrap">
+
+  <!-- STATE 1: List View -->
+  <div style="flex:1;min-width:300px">
+    <div class="label" style="margin-bottom:8px">State 1 — Queue / List View</div>
+    <div class="mockup">
+      <div class="mockup-header">IT Dashboard — IT Queue</div>
+      <div class="mockup-body" style="padding:0;overflow:hidden">
+        <div style="display:flex;height:320px">
+
+          <!-- Icon rail -->
+          <div style="width:44px;background:#1e293b;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:14px;flex-shrink:0">
+            <div style="width:26px;height:26px;background:#334155;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">🏠</div>
+            <div style="width:26px;height:26px;background:#2563eb;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">🎫</div>
+            <div style="width:26px;height:26px;background:#334155;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">📋</div>
+            <div style="width:26px;height:26px;background:#334155;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">⚙️</div>
+          </div>
+
+          <!-- Views sidebar -->
+          <div style="width:160px;background:#f8fafc;border-right:1px solid #e2e8f0;padding:10px 8px;flex-shrink:0;overflow-y:auto">
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:6px;padding:0 4px">Views</div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;color:#64748b">All Tickets</div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;color:#64748b">My Tickets</div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;color:#64748b">Unassigned</div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:10px 0 6px;padding:0 4px">Queues</div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;background:#dbeafe;color:#1d4ed8;font-weight:600;display:flex;justify-content:space-between">
+              <span>IT Queue</span><span style="background:#2563eb;color:#fff;border-radius:10px;padding:0px 5px;font-size:9px">7</span>
+            </div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;color:#64748b;display:flex;justify-content:space-between">
+              <span>Operations</span><span style="background:#e2e8f0;color:#64748b;border-radius:10px;padding:0px 5px;font-size:9px">4</span>
+            </div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin:10px 0 6px;padding:0 4px">Status</div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;color:#64748b">Pending Approval</div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;color:#64748b">In Progress</div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;color:#64748b">Waiting on Requester</div>
+            <div style="font-size:10px;padding:5px 8px;border-radius:4px;margin-bottom:1px;color:#64748b">Resolved</div>
+          </div>
+
+          <!-- Ticket list -->
+          <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+            <div style="padding:8px 12px;border-bottom:1px solid #e2e8f0;background:#fff;display:flex;align-items:center;gap:8px">
+              <span style="font-weight:700;font-size:11px;color:#0f172a">IT Queue</span>
+              <span style="font-size:9px;color:#94a3b8">7 open tickets</span>
+            </div>
+            <!-- Ticket rows -->
+            <div style="flex:1;overflow-y:auto">
+              <div style="padding:10px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer;background:#fff" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='#fff'">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+                  <div style="font-weight:600;font-size:10px;color:#0f172a">Printer not working — floor 3</div>
+                  <div style="font-size:9px;color:#94a3b8;white-space:nowrap;margin-left:8px">2h ago</div>
+                </div>
+                <div style="font-size:9px;color:#64748b;margin-bottom:4px">Sarah Martinez</div>
+                <div style="display:flex;gap:3px">
+                  <span style="background:#fef2f2;color:#b91c1c;padding:1px 6px;border-radius:8px;font-size:8px">High</span>
+                  <span style="background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:8px;font-size:8px">In Progress</span>
+                  <span style="background:#f1f5f9;color:#475569;padding:1px 6px;border-radius:8px;font-size:8px">Anthony</span>
+                </div>
+              </div>
+              <div style="padding:10px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer;background:#fff">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+                  <div style="font-weight:600;font-size:10px;color:#0f172a">VPN access request</div>
+                  <div style="font-size:9px;color:#94a3b8;white-space:nowrap;margin-left:8px">4h ago</div>
+                </div>
+                <div style="font-size:9px;color:#64748b;margin-bottom:4px">James Thompson</div>
+                <div style="display:flex;gap:3px">
+                  <span style="background:#f0fdf4;color:#166534;padding:1px 6px;border-radius:8px;font-size:8px">Low</span>
+                  <span style="background:#eff6ff;color:#1d4ed8;padding:1px 6px;border-radius:8px;font-size:8px">New</span>
+                  <span style="background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:8px;font-size:8px">Unassigned</span>
+                </div>
+              </div>
+              <div style="padding:10px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer;background:#fff">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px">
+                  <div style="font-weight:600;font-size:10px;color:#0f172a">New laptop setup</div>
+                  <div style="font-size:9px;color:#94a3b8;white-space:nowrap;margin-left:8px">1d ago</div>
+                </div>
+                <div style="font-size:9px;color:#64748b;margin-bottom:4px">Maria Lopez</div>
+                <div style="display:flex;gap:3px">
+                  <span style="background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:8px;font-size:8px">Med</span>
+                  <span style="background:#fef9c3;color:#854d0e;padding:1px 6px;border-radius:8px;font-size:8px">Triage</span>
+                  <span style="background:#f1f5f9;color:#475569;padding:1px 6px;border-radius:8px;font-size:8px">Anthony</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:#64748b;margin-top:6px;text-align:center">↑ Click any ticket row → enters State 2</p>
+  </div>
+
+  <!-- STATE 2: Ticket Workspace -->
+  <div style="flex:1;min-width:340px">
+    <div class="label" style="margin-bottom:8px">State 2 — Ticket Workspace (list replaced)</div>
+    <div class="mockup">
+      <div class="mockup-header">IT Dashboard — Ticket #1042</div>
+      <div class="mockup-body" style="padding:0;overflow:hidden">
+        <div style="display:flex;height:320px">
+
+          <!-- Icon rail -->
+          <div style="width:44px;background:#1e293b;display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:14px;flex-shrink:0">
+            <div style="width:26px;height:26px;background:#334155;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">🏠</div>
+            <div style="width:26px;height:26px;background:#2563eb;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">🎫</div>
+            <div style="width:26px;height:26px;background:#334155;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">📋</div>
+            <div style="width:26px;height:26px;background:#334155;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px">⚙️</div>
+          </div>
+
+          <!-- Properties panel (LEFT like Zendesk) -->
+          <div style="width:170px;background:#f8fafc;border-right:1px solid #e2e8f0;padding:10px;flex-shrink:0;overflow-y:auto">
+            <button style="font-size:9px;color:#2563eb;background:none;border:none;cursor:pointer;padding:0;margin-bottom:10px;display:flex;align-items:center;gap:3px">← Back to IT Queue</button>
+
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8;margin-bottom:8px">Ticket Properties</div>
+
+            <div style="margin-bottom:8px">
+              <div style="font-size:9px;color:#64748b;margin-bottom:2px">Requester</div>
+              <div style="font-size:10px;color:#0f172a;font-weight:500">Sarah Martinez</div>
+              <div style="font-size:9px;color:#64748b">sarah@company.com</div>
+            </div>
+
+            <div style="margin-bottom:8px">
+              <div style="font-size:9px;color:#64748b;margin-bottom:2px">Assignee</div>
+              <select style="width:100%;font-size:10px;padding:3px 5px;border:1px solid #e2e8f0;border-radius:4px;background:#fff">
+                <option>Anthony M.</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:8px">
+              <div style="font-size:9px;color:#64748b;margin-bottom:2px">Status</div>
+              <select style="width:100%;font-size:10px;padding:3px 5px;border:1px solid #e2e8f0;border-radius:4px;background:#fff">
+                <option>In Progress</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:8px">
+              <div style="font-size:9px;color:#64748b;margin-bottom:2px">Priority</div>
+              <select style="width:100%;font-size:10px;padding:3px 5px;border:1px solid #e2e8f0;border-radius:4px;background:#fff">
+                <option>High</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:8px">
+              <div style="font-size:9px;color:#64748b;margin-bottom:2px">Queue</div>
+              <select style="width:100%;font-size:10px;padding:3px 5px;border:1px solid #e2e8f0;border-radius:4px;background:#fff">
+                <option>IT</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:8px">
+              <div style="font-size:9px;color:#64748b;margin-bottom:2px">Category</div>
+              <select style="width:100%;font-size:10px;padding:3px 5px;border:1px solid #e2e8f0;border-radius:4px;background:#fff">
+                <option>Hardware</option>
+              </select>
+            </div>
+
+            <div style="border-top:1px solid #e2e8f0;padding-top:8px;margin-top:4px">
+              <div style="font-size:9px;color:#64748b;margin-bottom:2px">Submitted</div>
+              <div style="font-size:9px;color:#374151">Apr 9, 2026 9:02am</div>
+            </div>
+          </div>
+
+          <!-- Conversation (CENTER — full width) -->
+          <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+            <div style="padding:8px 12px;border-bottom:1px solid #e2e8f0;background:#fff;flex-shrink:0">
+              <div style="font-weight:700;font-size:11px;color:#0f172a">Printer not working — floor 3</div>
+              <div style="font-size:9px;color:#64748b">Sarah Martinez &bull; sarah@company.com</div>
+            </div>
+
+            <!-- Thread -->
+            <div style="flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:7px;background:#f8fafc">
+              <div style="background:#fff;border:1px solid #e2e8f0;border-radius:6px;padding:7px 10px;font-size:10px">
+                <div style="font-weight:600;color:#374151;margin-bottom:2px;font-size:9px">Sarah Martinez <span style="font-weight:400;color:#94a3b8">Apr 9 · 9:02am</span></div>
+                <div style="color:#4b5563">The printer on floor 3 keeps showing offline every morning. I've tried turning it off and back on but it happens again the next day.</div>
+              </div>
+              <div style="background:#eff6ff;border:1px solid #dbeafe;border-radius:6px;padding:7px 10px;font-size:10px">
+                <div style="font-weight:600;color:#1d4ed8;margin-bottom:2px;font-size:9px">Anthony M. <span style="font-weight:400;color:#93c5fd">Apr 9 · 10:15am · Reply</span></div>
+                <div style="color:#1e40af">Hi Sarah! Try restarting the print spooler: Start → Run → services.msc → Print Spooler → Restart.</div>
+              </div>
+              <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:6px;padding:7px 10px;font-size:10px;border-left:3px solid #22c55e">
+                <div style="font-weight:600;color:#166534;margin-bottom:2px;font-size:9px">🔒 Internal note — Anthony M. <span style="font-weight:400;color:#86efac">Apr 9 · 10:16am</span></div>
+                <div style="color:#15803d">HP 4015 recurring spooler issue — may need firmware 3.7.2 update.</div>
+              </div>
+            </div>
+
+            <!-- Reply composer -->
+            <div style="border-top:1px solid #e2e8f0;background:#fff;flex-shrink:0">
+              <div style="display:flex;border-bottom:1px solid #f1f5f9">
+                <button style="padding:5px 12px;background:#2563eb;color:#fff;font-size:10px;font-weight:600;border:none;cursor:pointer">Reply</button>
+                <button style="padding:5px 12px;color:#64748b;font-size:10px;border:none;background:transparent;cursor:pointer">Internal Note</button>
+              </div>
+              <div style="padding:7px 10px;font-size:10px;color:#94a3b8;min-height:36px">Type your reply to Sarah...</div>
+              <div style="padding:5px 10px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #f1f5f9">
+                <span style="font-size:9px;color:#94a3b8">Sending from support@company.com</span>
+                <button style="padding:3px 10px;background:#2563eb;color:#fff;font-size:10px;border-radius:4px;border:none;cursor:pointer">Send</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:#64748b;margin-top:6px;text-align:center">↑ "← Back to IT Queue" returns to State 1</p>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top:16px">Does this match what you had in mind? Approve to write the spec.</p>
